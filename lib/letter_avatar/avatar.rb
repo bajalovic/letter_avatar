@@ -11,14 +11,17 @@ module LetterAvatar
 
     FONT_FILENAME = File.join(File.expand_path('../../', File.dirname(__FILE__)), 'Roboto-Medium')
 
+    DEFAULT_LETTERS_COUNT = 2
+
     class << self
       class Identity
         attr_accessor :color, :letter
 
-        def self.from_username(username)
+        def self.from_username(username, letters_count)
           identity = new
           identity.color = LetterAvatar::Colors.for(username)
-          identity.letter = username[0].upcase
+          letters = username.split(/\s+/).map {|word| word[0]}.join('')[0..letters_count - 1]
+          identity.letter = letters.upcase
 
           identity
         end
@@ -29,7 +32,8 @@ module LetterAvatar
       end
 
       def generate(username, size, opts = nil)
-        identity = Identity.from_username(username)
+        letters_count = opts && opts[:letters_count] || DEFAULT_LETTERS_COUNT
+        identity = Identity.from_username(username, letters_count)
 
         cache = true
         cache = false if opts && opts[:cache] == false
